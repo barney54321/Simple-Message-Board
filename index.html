@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+
+        <style>
+            .container {
+                background-color: honeydew;
+                border-radius: 25px;
+                border: 2px solid black;
+                padding: 20px; 
+            }
+
+            .display-4 {
+                background-color: honeydew;
+                font-family: Arial;
+            }
+
+            #name {
+                font-family: Georgia;
+                background-color: white;
+                border-radius: 5px;
+                border: 1px solid lightblue;
+                padding: 7px; 
+            }
+
+            #message {
+                font-family: Georgia;
+                background-color: white;
+                border-radius: 5px;
+                border: 1px solid lightblue;
+                padding: 10px; 
+                width: 300px;
+                height: 100px;
+            }
+
+        </style>
+    </head>
+    
+    <body>
+        <div class="container">
+            <br>
+            <div class="jumbotron">
+                <h1 class="display-4">Send Message</h1>
+                <input id = "name" name="name" class="form-control" placeholder="Name">
+                <br>
+                <textarea id = "message" class="form-control" placeholder="Your message here"></textarea>
+                <br>
+                <button id="send" class="btn btn-success">Send</button>
+            </div>
+            
+            <div id="messages">
+            </div>
+
+            <p id="random"></p>
+        </div>
+
+        <script>
+
+            var socket = io();
+            socket.on("message", addMessages)
+
+            $(() => {
+                $("#send").click(()=>{
+                    sendMessage({
+                        name: $("#name").val(), 
+                        message:$("#message").val()
+                    });
+                })
+                getMessages()
+            })
+
+            function addMessages(message){
+                var string = "<h4>" + message.name + "</h4>" + message.message;
+                $("#messages").append(string)
+            }
+
+            function getMessages(){
+                $.get("http://localhost:3000/messages", (data) => {
+                    for (var i = 0; i < data.mes.length; i++) {
+                        addMessages(data.mes[i]);
+                    }
+                })
+            }
+
+            function sendMessage(message){
+                $.post("http://localhost:3000/messages", message)
+            }           
+
+        </script>
+    </body>
+</html>
